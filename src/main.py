@@ -7,10 +7,10 @@ from DHT.network.dht import DHT
 
 
 if __name__ == "__main__":
-    env = simpy.Environment()
-    key_len = 8
-    dht = DHT(env, key_len)
-    env.process(dht.simulator(10000))
-    env.run(until=1000000000**2)
-    dht.display()
+    
+    dht = DHT(ENV, KEY_LEN)
+    ENV.process(dht.simulator())
+    ENV.run(until=RUNNING_TIME)
+
+    dht.display() # Display the DHTenv
 

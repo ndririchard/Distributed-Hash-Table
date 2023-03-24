@@ -20,7 +20,8 @@ class DHT:
         cn = self.nodes[0]
         c = True
         while c:
-            graph.add_edge(cn.id, cn.next.id)
+            if cn.isAlive:
+                graph.add_edge(cn.id, cn.next.id)
             if cn.next == self.nodes[0]:
                 c = False
             cn = cn.next
@@ -30,17 +31,27 @@ class DHT:
         plt.show()  
 
 
-    def simulator(self, time):
-        for loop in range(30):
-            t = random.random()
-            node = Node(self.env, random.randint(1, 1000))
-            print("New node_{} created at {}".format(node.id, self.env.now))
-            node.join(random.choice(self.nodes))
-            self.nodes.append(node)
-            yield self.env.timeout(t)
+    def simulator(self):
         
-        rdn = random.choice(self.nodes)
-        rdn.leave()
-        self.nodes.remove(rdn)
-        print("Node {} left at {}".format(rdn.id, self.env.now))
-        yield self.env.timeout(1)
+        while True:
+            action = random.random() # choose a random action for the DHT
+
+            if action <= TRESHOLD: # create a new node
+
+                node = Node(self.env, random.randint(MIN_NODE_ID, MAX_NODE_ID))
+                print("NEW_NODE : Node-{} is created at {}".format(node.id, self.env.now))
+                node.join(random.choice(self.nodes)) # join the DHT
+                self.nodes.append(node) # Add the node to the DHT 
+                yield self.env.timeout(JOIN_TTL)
+            
+            else:
+                node = random.choice((self.nodes))
+                node.leave()
+                print("LEAVE_EVENT : Node-{} left ".format(node.id))
+                yield self.env.timeout(LEAVE_TTL)
+           
+
+
+
+
+        
